@@ -1,49 +1,50 @@
 import Foundation
 
+extension String {
+  static let minus = "-"
+  static var add: Self {
+    return "+"
+  }
+  static let multiply = "*"
+  static let divide = "/"
+}
+
 enum DivisionError: Error {
-    case divisionByZero
+    case genericMathError(firstOperand: Float, secondOperand: Float, message: String)
 }
 
 func addOperands(firstOperand: Float?, secondOperand: Float?) -> Float? {
-  guard let firstNumber = firstOperand else {
-    return nil
-  } 
-  guard let secondNumber = secondOperand else {
+  guard let firstNumber = firstOperand, 
+        let secondNumber = secondOperand else {
     return nil
   }
   return firstNumber + secondNumber
 }
 
 func subtractOperands(firstOperand: Float?, secondOperand: Float?) -> Float? {
-  guard let firstNumber = firstOperand else {
+  guard let firstNumber = firstOperand, 
+        let secondNumber = secondOperand else {
     return nil
   } 
-  guard let secondNumber = secondOperand else {
-    return nil
-  }
   return firstNumber - secondNumber
 }
 
 func divideOperands(firstOperand: Float?, secondOperand: Float?) throws -> Float? {
-  guard let firstNumber = firstOperand else {
+  guard let firstNumber = firstOperand,
+        let secondNumber = secondOperand else {
     return nil
   } 
-  guard let secondNumber = secondOperand else {
-    return nil
-  }
-  if secondOperand == 0 {
-    throw DivisionError.divisionByZero
+  if secondOperand == .zero {
+    throw DivisionError.genericMathError(firstOperand: firstNumber, secondOperand: secondNumber, message: "Division by zero")
   }
   return firstNumber / secondNumber
 }
 
 func multiplyOperands(firstOperand: Float?, secondOperand: Float?) -> Float? {
-  guard let firstNumber = firstOperand else {
+  guard let firstNumber = firstOperand,
+        let secondNumber = secondOperand else {
     return nil
   } 
-  guard let secondNumber = secondOperand else {
-    return nil
-  }
   return firstNumber * secondNumber
 }
 
@@ -58,13 +59,13 @@ func calculateOperands(operation: String?, firstOperand: Float?, secondOperand: 
       return nil
     }
     switch operation {
-          case "+":
+          case .add:
             return addOperands(firstOperand: firstNumber, secondOperand: secondNumber)
-          case "-":
+          case .minus:
             return subtractOperands(firstOperand: firstNumber, secondOperand: secondNumber)
-          case "/":
+          case .divide:
             return try divideOperands(firstOperand: firstNumber, secondOperand: secondNumber)
-          case "*":
+          case .multiply:
             return multiplyOperands(firstOperand: firstNumber, secondOperand: secondNumber)
           default:
             return nil
@@ -73,17 +74,22 @@ func calculateOperands(operation: String?, firstOperand: Float?, secondOperand: 
 func testTask() {
   do {
     let firstNumber: Float? = 10
-    let secondNumber: Float? = 5
-    let operation: String? = "/"
+    let secondNumber: Float? = 4
+    let operation: String? = .minus
     let result: Float? = try calculateOperands(operation:operation, firstOperand:firstNumber, secondOperand:secondNumber)
 
     if let result = result {
       print(result)
     } else {
-      print("Вам потрібно ввести коректні дані!")
+      print("You must enter valid data!")
     }
-  } catch DivisionError.divisionByZero {
-    print("DivisionByZero Error")
+  } catch DivisionError.genericMathError(let a, let b, let m)  {
+    print(
+      "Division by zero error: \n" +
+      "First operand: " + String(a) + "\n" + 
+      "Second operand: " + String(b) + "\n" +
+      "Message: " + m
+      )
   }
   catch {}
 }
